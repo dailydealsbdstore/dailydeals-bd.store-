@@ -1,0 +1,18 @@
+{
+  "name": "dailydeals-bd-api",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy",
+    "db:create": "wrangler d1 create dailydeals-bd-db",
+    "db:migrate:remote": "wrangler d1 migrations apply dailydeals-bd-db --remote"
+  },
+  "dependencies": {
+    "jose": "^5.9.6"
+  },
+  "devDependencies": {
+    "wrangler": "^4.45.0"
+  }
+}

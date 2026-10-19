@@ -1,0 +1,10 @@
+node_modules/
+worker/node_modules/
+worker/.dev.vars
+worker/.dev.vars.*
+worker/.env
+worker/.env.*
+.env
+.env.*
+.DS_Store
+wrangler-report.json

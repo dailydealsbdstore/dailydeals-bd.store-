@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+Disallow: /admin.html
+Disallow: /login.html
+Disallow: /account.html
+Disallow: /cart.html
+Sitemap: https://dailydeals-bd.store/sitemap.xml
