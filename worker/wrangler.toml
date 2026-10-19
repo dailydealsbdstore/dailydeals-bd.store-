@@ -4,12 +4,7 @@ compatibility_date = "2026-10-19"
 
 [vars]
 FIREBASE_PROJECT_ID = "dailydeals-bd"
-# Set ADMIN_UID in the Cloudflare dashboard after identifying your Firebase user UID.
-# If your Business Koro API key was created with a domain restriction, set BUSINESS_KORO_DOMAIN = "dailydeals-bd.store".
 ALLOWED_ORIGINS = "https://dailydeals-bd.store,https://www.dailydeals-bd.store,https://dailydeals-bd-store.pages.dev"
 
-[[d1_databases]]
-binding = "DB"
-database_name = "dailydeals-bd-db"
-database_id = "REPLACE_WITH_YOUR_D1_DATABASE_ID"
-migrations_dir = "migrations"
+# Secrets set in Cloudflare: BUSINESS_KORO_API_KEY and ADMIN_UID.
+# No D1 binding is needed by this Firebase-first Worker.

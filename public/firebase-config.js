@@ -1,4 +1,5 @@
-// Public Firebase web configuration only. Never add service-account/private keys here.
+// Public Firebase web configuration. These values are safe to use in browser code.
+// Access control is enforced by Firestore Security Rules, never by hiding this config.
 import { initializeApp } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-app.js';
 import {
   getAuth,
@@ -6,6 +7,7 @@ import {
   setPersistence,
   browserLocalPersistence,
 } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js';
+import { getFirestore } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-firestore.js';
 
 export const firebaseConfig = {
   apiKey: 'AIzaSyBQp9hBPcUt-96EqWTiND76hcWBf5nSnQ',
@@ -19,5 +21,6 @@ export const firebaseConfig = {
 
 export const firebaseApp = initializeApp(firebaseConfig);
 export const auth = getAuth(firebaseApp);
+export const db = getFirestore(firebaseApp);
 export const googleProvider = new GoogleAuthProvider();
 setPersistence(auth, browserLocalPersistence).catch(() => {});

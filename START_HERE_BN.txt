@@ -1,0 +1,20 @@
+DAILY DEALS BD — আগে এটি পড়ুন
+
+আপনার চাওয়া ব্যবস্থা:
+1) Business Koro থেকে Admin Panel-এর Sync বোতামে পণ্য আনা হবে।
+2) পণ্য Firebase Firestore-এ save হবে। Website শুধু Firestore থেকে পণ্য দেখাবে।
+3) নিজের পণ্যও Admin Panel থেকে ম্যানুয়ালি যোগ করা যাবে।
+4) অর্ডার/সেটিংস Firestore-এ থাকবে। Admin confirm না করলে Business Koro-তে অর্ডার যাবে না।
+5) Cloudflare Worker শুধু Business Koro API-র secure bridge; D1 primary database নয়।
+
+কাজের ক্রম:
+A. docs/DEPLOYMENT_FIREBASE_FIRST_BN.md খুলুন।
+B. Firestore database + rules + admins/{আপনার Admin UID} doc ঠিক করুন।
+C. Cloudflare Worker-এ worker/src/index.js deploy করুন এবং আগের secrets রেখে দিন।
+D. public/ ফোল্ডারের নির্দেশিত files GitHub repository-তে একই path-এ update করুন।
+E. Admin Panel থেকে Business Koro products sync করুন, তারপর একটি manual product ও COD test order পরীক্ষা করুন।
+
+সতর্কতা:
+- আগের D1-based Worker Fix ZIP deploy করবেন না।
+- এখানে দেওয়া code আপনার account-এ live deploy করা হয়নি; deployment ও Business Koro live API test এখনও করতে হবে।
+- Business Koro API key বা Firebase service-account private key public GitHub files-এ রাখবেন না।
