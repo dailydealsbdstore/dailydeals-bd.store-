@@ -1,7 +1,7 @@
 import { auth } from '/firebase-config.js';
 import { onAuthStateChanged, signOut } from 'https://www.gstatic.com/firebasejs/12.4.0/firebase-auth.js';
 
-export const API_BASE = 'https://api.dailydeals-bd.store';
+export const API_BASE = 'https://dailydeals-bd-api.dailydealsbd-store.workers.dev';
 export const money = (value) => new Intl.NumberFormat('bn-BD', { style:'currency', currency:'BDT', maximumFractionDigits:0 }).format(Number(value || 0));
 export const formatDate = (value) => { try { return new Intl.DateTimeFormat('bn-BD',{dateStyle:'medium',timeStyle:'short'}).format(new Date(value)); } catch { return value || ''; } };
 export const escapeHtml = (value='') => String(value).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
@@ -22,6 +22,42 @@ export async function apiFetch(path, options={}) {
   let data = {};
   try { data = await response.json(); } catch {}
   if (!response.ok) { const error = new Error(data.error || data.message || `রিকোয়েস্ট ব্যর্থ হয়েছে (${response.status})`); error.data = data; error.status = response.status; throw error; }
+
+  // বর্তমান Cloudflare Worker D1 পণ্যের উত্তর { success: true, products: [...] } দিতে পারে,
+  // আর storefront পুরোনো/Business Koro কাঠামোয় { data: [...] } আশা করে। দুটোই সামলান।
+  if (String(path).split('?')[0] === '/api/products') {
+    const rawProducts = Array.isArray(data.data) ? data.data
+      : Array.isArray(data.products) ? data.products
+      : Array.isArray(data.result?.products) ? data.result.products
+      : null;
+    if (rawProducts) {
+      data.data = rawProducts.map((p) => {
+        const activeValue = p.is_active ?? p.isActive ?? p.active;
+        const isActive = activeValue === undefined || activeValue === null
+          ? true
+          : (activeValue === true || activeValue === 1 || activeValue === '1' || activeValue === 'true');
+        const stockValue = p.stock_quantity ?? p.stockQuantity ?? p.stock ?? p.quantity;
+        const inStock = typeof p.inStock === 'boolean'
+          ? p.inStock
+          : (stockValue === undefined || stockValue === null ? isActive : (isActive && Number(stockValue) > 0));
+        const existingImages = Array.isArray(p.images) ? p.images.filter(v => typeof v === 'string' && v.trim()) : [];
+        const image = p.image_url || p.imageUrl || p.image || p.photo_url || '';
+        return {
+          ...p,
+          id: String(p.id ?? p.product_id ?? p.productId ?? ''),
+          name: p.name || p.name_bn || p.name_en || p.title || 'পণ্য',
+          name_bn: p.name_bn || p.name || '',
+          name_en: p.name_en || p.name || '',
+          description: p.description || p.description_bn || p.description_en || p.details || '',
+          images: existingImages.length ? existingImages : (image ? [String(image)] : []),
+          price: Number(p.price ?? p.selling_price ?? p.sellingPrice ?? 0),
+          inStock,
+          variants: Array.isArray(p.variants) ? p.variants : [],
+          category: p.category || p.category_name || p.categoryName || 'অন্যান্য',
+        };
+      }).filter(p => p.id !== '');
+    }
+  }
   return data;
 }
 export function watchAuth(callback) { return onAuthStateChanged(auth, callback); }
