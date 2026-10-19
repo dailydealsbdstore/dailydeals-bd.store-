@@ -4,7 +4,7 @@
 
 ## কী আছে
 
-- Responsive Bengali storefront ও পণ্যের তালিকা
+- Responsive Bengali/English storefront with language toggle; logo-matched royal-blue/yellow brand design
 - Business Koro Storefront API থেকে লাইভ product/stock data
 - Server-side pricing: `costPrice + ৳৩০ packaging` + default percentage/fixed margin; product-level override
 - ঢাকা সিটির ভিতরে ৳৮০ এবং বাইরে ৳১৩০ delivery (Admin settings থেকে পরিবর্তনযোগ্য)
@@ -12,6 +12,7 @@
 - অর্ডার প্রথমে স্থানীয় Cloudflare D1-তে `pending_review` হয়; Admin Confirm না করা পর্যন্ত Business Koro-তে যায় না
 - Admin order review, item/customer/address edit, same-customer order merge, manual-payment verification, Business Koro submission result
 - Firebase Email/Password ও Google sign-in; Facebook Login নেই
+- Bengali/English UI toggle saved in the browser; product name/description remain in the language Business Koro provides unless separately translated
 - Customer order history when signed in
 - Cloudflare Pages (static UI) + Cloudflare Worker (secret API backend) + D1 (local order records)
 
@@ -48,3 +49,11 @@ Business Koro-এর তোমার দেওয়া ডকুমেন্টে
 ## Local syntax checks
 
 `node --input-type=module --check < public/assets/store.js` এবং অন্য JS ফাইল দিয়ে syntax check করা যায়। Worker deploy-এর আগে `worker` ফোল্ডারে `npm install` প্রয়োজন।
+
+
+## Brand & language update
+
+- Store UI has a Bangla/English toggle in the header, saved per browser.
+- Logo and hero banner are supplied brand assets in `public/assets/`.
+- English mode translates the website UI; supplier-provided product names/descriptions are shown as Business Koro supplies them. For genuinely bilingual product copy, add optional translated product titles/descriptions to the admin/product model after the API contract is confirmed.
+- Client-side language switching is not a substitute for separate indexable `/en/` pages if distinct English SEO landing pages are required.

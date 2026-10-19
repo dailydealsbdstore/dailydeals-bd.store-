@@ -5,3 +5,40 @@
 @media(max-width:380px){.product-grid,.page-shell .product-grid{grid-template-columns:1fr}.product-image{height:220px}.hero-actions{align-items:stretch;flex-direction:column}.hero-card{min-width:150px;padding:10px}.hero-card-top{left:3%}.hero-card-bottom{right:2%}}
 .edit-dialog{border:0;border-radius:18px;padding:24px;width:min(760px,calc(100% - 24px));max-height:90vh;overflow:auto;box-shadow:0 30px 100px #08152b50;color:var(--ink)}.edit-dialog::backdrop{background:#0c1728a8;backdrop-filter:blur(3px)}.edit-dialog form{min-width:0}.edit-dialog .icon-button{display:grid;place-items:center;border:0;background:#f3f5f8;border-radius:9px;width:35px;height:35px;font-size:1.35rem}.edit-items-list{display:grid;gap:10px}.edit-item-row{display:grid;grid-template-columns:minmax(0,1fr) 85px 95px 34px;gap:8px;align-items:center;border:1px solid #e7ebf1;border-radius:10px;padding:10px}.edit-item-row strong{font-size:.84rem;display:block}.edit-item-row small{color:#8792a3;font-size:.73rem}.edit-item-row input{border:1px solid #dfe4eb;border-radius:7px;padding:7px;width:100%;min-width:0}.edit-item-row button{border:1px solid #f0d5d0;border-radius:7px;background:#fff3f0;color:#b6534d;height:34px}.edit-add-row{display:flex;gap:8px;margin-top:12px}.edit-add-row select{flex:1;min-width:0;border:1px solid #dfe4eb;border-radius:8px;padding:9px}.edit-summary{margin-top:12px;background:#f7f8fa;border-radius:9px;padding:12px;font-weight:700;color:var(--navy)}@media(max-width:600px){.edit-dialog{padding:16px}.edit-item-row{grid-template-columns:minmax(0,1fr) 62px 85px 30px;padding:8px}.edit-item-row input{padding:6px}.edit-dialog .form-grid{grid-template-columns:1fr}}
 .edit-item-row{grid-template-columns:minmax(120px,1fr) 68px 95px 95px 34px}.edit-item-row .field{font-size:.72rem;gap:4px}.edit-item-row input{font-size:.8rem}.edit-item-row>button{align-self:end}@media(max-width:600px){.edit-item-row{grid-template-columns:minmax(0,1fr) 55px 74px 74px 28px}.edit-item-row .field{font-size:.68rem}.edit-item-row input{font-size:.75rem;padding:5px}}
+
+
+/* Daily Deals BD brand refresh: royal blue + golden yellow + white */
+:root{--navy:#0648ad;--navy2:#0b5bc7;--orange:#ffc400;--orange2:#ffdc43;--ink:#102446;--muted:#65748a;--border:#dfe7f4;--soft:#f5f8ff;--shadow:0 18px 54px rgba(6,54,130,.12)}
+.site-header{border-bottom-color:#e3ebfa;box-shadow:0 4px 18px rgba(5,49,116,.04)}
+.brand{color:#0648ad}.brand b{color:#e4a900}.brand small{color:#65748a}
+.brand-logo{width:56px;height:56px;object-fit:contain;flex:none;border-radius:50%}
+.auth-logo-image{width:92px;height:92px;object-fit:contain;margin:0 auto 12px;border-radius:50%}
+.admin-topbar .brand-logo{width:50px;height:50px}
+.btn-primary{background:#ffc400;color:#082b68;box-shadow:0 8px 18px rgba(255,196,0,.25)}
+.btn-primary:hover{background:#ffda45;color:#082b68;box-shadow:0 12px 23px rgba(255,196,0,.3)}
+.btn-ghost{border-color:#d8e3f5;color:#0648ad}
+.btn-outline{border-color:#d6e1f4;color:#0648ad}
+.btn-outline:hover{background:#f1f6ff;border-color:#98b5ed}
+.search-box button{background:#0648ad}.nav-link:hover,.footer-links a:hover{color:#c08f00}
+.cart-link{background:#fff6cb;color:#17417e}.cart-link span{background:#ffc400;color:#07306f}
+.eyebrow,.product-category{color:#a47a00}
+.hero h1{color:#083579}.hero h1 span{color:#e9ad00}
+.hero-art{height:auto;min-height:0;background:transparent;overflow:visible;border-radius:20px;display:block;box-shadow:0 20px 44px rgba(6,49,112,.13)}
+.hero-banner-link{transition:transform .2s,box-shadow .2s}.hero-banner-link:hover{transform:translateY(-3px);box-shadow:0 24px 50px rgba(6,49,112,.19)}
+.brand-banner{display:block;width:100%;height:auto;aspect-ratio:960/357;object-fit:cover;border-radius:20px;border:1px solid rgba(6,72,173,.12)}
+.hero-glow,.hero-device,.hero-card{display:none}
+.benefit-icon{background:#fff5c9;color:#0750b8}
+.chip.active,.chip:hover{background:#0648ad;border-color:#0648ad}
+.product-card:hover{box-shadow:0 18px 45px rgba(6,54,130,.14)}
+.product-price{color:#0648ad}.product-buy{background:#0648ad}.product-buy:hover{background:#0b5bc7}
+.product-more{background:#fff4bf;color:#0648ad}
+.field input:focus,.field select:focus,.field textarea:focus,.product-controls select:focus{border-color:#8aafea;box-shadow:0 0 0 3px #eaf1ff}
+.step-card>span{background:#fff2b6;color:#0648ad}
+.newsletter-section{background:linear-gradient(115deg,#eff5ff,#fff9db);border-color:#e0e9fa}
+.site-footer{border-top-color:#e2eafa}
+.lang-toggle{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-width:76px;min-height:38px;padding:7px 12px;border:1px solid #0648ad;border-radius:10px;background:#fff;color:#0648ad;font-weight:800;font-size:.82rem;white-space:nowrap;cursor:pointer;box-shadow:0 3px 9px rgba(6,72,173,.07)}
+.lang-toggle:hover{background:#fff5c6;border-color:#d8a800}
+.header-actions .lang-toggle{flex:none}
+.admin-top-actions .lang-toggle{flex:none}
+@media(max-width:900px){.brand-logo{width:49px;height:49px}.hero{grid-template-columns:1fr;gap:28px;padding-top:25px}.hero-art{order:0}.hero-copy{order:1}.brand-banner{aspect-ratio:960/357}}
+@media(max-width:700px){.brand-logo{width:43px;height:43px}.brand{gap:7px;font-size:.9rem}.brand small{font-size:.48rem}.header-actions{gap:8px}.lang-toggle{min-width:60px;min-height:35px;padding:6px 9px}.site-header{gap:10px}.hero{padding-block:22px 36px}.hero-art,.brand-banner{border-radius:13px}}
