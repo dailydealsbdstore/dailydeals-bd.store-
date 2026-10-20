@@ -24,6 +24,13 @@ export function addToCart(product, qty=1, variant={}) {
   else cart.push(entry);
   saveCart(cart); toast('পণ্য কার্টে যোগ হয়েছে');
 }
+export function buyNow(product, qty=1, variant={}) {
+  // Keep the customer's existing normal cart untouched; direct checkout uses a temporary single-item session cart.
+  const entry = { key: `${product.id}|${variant.color || ''}|${variant.size || ''}`, id:String(product.id), source:product.source || 'manual', sourceProductId:product.sourceProductId || null, name:product.name || 'পণ্য', image:(product.images || [])[0] || '', price:Number(product.price || 0), qty:Math.max(1,Math.min(20,Number(qty)||1)), variant };
+  sessionStorage.setItem('dd-buy-now-item', JSON.stringify(entry));
+  location.href = '/cart.html?buyNow=1';
+}
+
 export async function apiFetch(path, options={}) {
   const headers = new Headers(options.headers || {}); headers.set('Accept','application/json');
   if (options.body && !headers.has('Content-Type')) headers.set('Content-Type','application/json');
