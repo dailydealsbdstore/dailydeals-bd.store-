@@ -42,3 +42,17 @@
 .admin-top-actions .lang-toggle{flex:none}
 @media(max-width:900px){.brand-logo{width:49px;height:49px}.hero{grid-template-columns:1fr;gap:28px;padding-top:25px}.hero-art{order:0}.hero-copy{order:1}.brand-banner{aspect-ratio:960/357}}
 @media(max-width:700px){.brand-logo{width:43px;height:43px}.brand{gap:7px;font-size:.9rem}.brand small{font-size:.48rem}.header-actions{gap:8px}.lang-toggle{min-width:60px;min-height:35px;padding:6px 9px}.site-header{gap:10px}.hero{padding-block:22px 36px}.hero-art,.brand-banner{border-radius:13px}}
+
+/* Market/list price + actual discounted sale price. A discount is shown only when marketPrice > price. */
+.price-comparison{display:flex;justify-content:space-between;align-items:center;gap:10px;min-width:0}
+.price-comparison-card{margin-top:auto;margin-bottom:13px}
+.price-comparison-values{display:flex;flex-direction:column;gap:1px;min-width:0}
+.market-price{display:block;color:#8792a3;font-size:.76rem;line-height:1.25;text-decoration:line-through;text-decoration-thickness:1.4px}
+.sale-price-label{display:block;color:#7c8799;font-size:.68rem;line-height:1.2;font-weight:600}
+.discount-badge{display:inline-flex;align-items:center;justify-content:center;flex:none;border:1px solid #ffd8cf;background:#fff0ed;color:#c54545;border-radius:7px;padding:5px 7px;font-size:.7rem;font-weight:800;white-space:nowrap}
+.price-comparison-card .sale-price{margin:0;font-family:Manrope,'Hind Siliguri',sans-serif;font-size:1.2rem;font-weight:800;color:var(--navy);line-height:1.3}
+.price-comparison-detail{justify-content:flex-start;align-items:center;gap:14px;margin:20px 0}
+.price-comparison-detail .market-price{font-size:.96rem}
+.price-comparison-detail .sale-price-label{font-size:.82rem}
+.price-comparison-detail .sale-price{margin:0;font-family:Manrope,'Hind Siliguri',sans-serif;font-size:2rem;font-weight:800;color:var(--navy);line-height:1.25}
+@media(max-width:480px){.price-comparison-card{gap:5px}.discount-badge{font-size:.64rem;padding:4px 5px}.price-comparison-card .sale-price{font-size:1.08rem}.market-price{font-size:.7rem}}
