@@ -1,138 +1,60 @@
 <!doctype html>
 <html lang="bn"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Admin Panel | Daily Deals BD</title><meta name="robots" content="noindex,nofollow"><link rel="stylesheet" href="/assets/styles.css"><script type="module" src="/assets/admin.js"></script><link rel="icon" type="image/svg+xml" href="/favicon.svg">
 <style id="pricing-table-compact-fix">
-/* Daily Deals BD - compact pricing table layout */
-/* Applies only to the Admin > Pricing table; keeps existing site colours and logic. */
-#pricingPanel .pricing-table-wrap {
-  width: 100%;
-  max-width: 100%;
-  overflow-x: hidden;
-  overflow-y: visible;
-  margin-top: 15px;
+/* Bulk pricing: fixed-width compact table, wrap long names, no horizontal slider. */
+#pricingPanel .pricing-table-wrap{width:100%;max-width:100%;overflow-x:hidden;overflow-y:visible;margin-top:15px}
+#pricingPanel .pricing-table-wrap .data-table{width:100%;min-width:0;table-layout:fixed;white-space:normal;font-size:.76rem}
+#pricingPanel .pricing-table-wrap .data-table th,#pricingPanel .pricing-table-wrap .data-table td{min-width:0;padding:8px 5px;white-space:normal;overflow-wrap:anywhere;vertical-align:middle}
+#pricingPanel .pricing-table-wrap .data-table th:nth-child(1),#pricingPanel .pricing-table-wrap .data-table td:nth-child(1){width:3.5%;text-align:center}
+#pricingPanel .pricing-table-wrap .data-table th:nth-child(2),#pricingPanel .pricing-table-wrap .data-table td:nth-child(2){width:23.5%}
+#pricingPanel .pricing-table-wrap .data-table th:nth-child(3),#pricingPanel .pricing-table-wrap .data-table td:nth-child(3){width:7.5%}
+#pricingPanel .pricing-table-wrap .data-table th:nth-child(4),#pricingPanel .pricing-table-wrap .data-table td:nth-child(4){width:8%}
+#pricingPanel .pricing-table-wrap .data-table th:nth-child(5),#pricingPanel .pricing-table-wrap .data-table td:nth-child(5){width:8.5%}
+#pricingPanel .pricing-table-wrap .data-table th:nth-child(6),#pricingPanel .pricing-table-wrap .data-table td:nth-child(6){width:9%}
+#pricingPanel .pricing-table-wrap .data-table th:nth-child(7),#pricingPanel .pricing-table-wrap .data-table td:nth-child(7){width:8.5%}
+#pricingPanel .pricing-table-wrap .data-table th:nth-child(8),#pricingPanel .pricing-table-wrap .data-table td:nth-child(8){width:9%}
+#pricingPanel .pricing-table-wrap .data-table th:nth-child(9),#pricingPanel .pricing-table-wrap .data-table td:nth-child(9){width:12%}
+#pricingPanel .pricing-table-wrap .data-table th:nth-child(10),#pricingPanel .pricing-table-wrap .data-table td:nth-child(10){width:10.5%}
+#pricingPanel .pricing-table-wrap .data-table td:nth-child(2) strong{display:block;white-space:normal;overflow-wrap:anywhere;word-break:normal;line-height:1.4}
+#pricingPanel .pricing-table-wrap .data-table td:nth-child(2) small{display:block;margin-top:3px;font-size:.65rem;color:#7e899b;overflow-wrap:anywhere}
+#pricingPanel .pricing-table-wrap .data-table input:not([type=checkbox]),#pricingPanel .pricing-table-wrap .data-table select{display:block;width:100%;min-width:0;max-width:100%;box-sizing:border-box;padding:6px 3px;font-size:.72rem}
+#pricingPanel .pricing-table-wrap .data-table input[type=checkbox],#pricingPanel #selectAllPricing{width:15px;height:15px;min-width:15px;margin:0;accent-color:#0b4bb3;cursor:pointer}
+#pricingPanel .pricing-table-wrap .data-table td:nth-child(9) small{display:block;margin-top:3px;font-size:.63rem;color:#7e899b;line-height:1.3}
+#pricingPanel .pricing-table-wrap .data-table td:nth-child(10) .btn{width:100%;padding:6px 4px;font-size:.7rem;white-space:normal;overflow-wrap:anywhere}
+#pricingPanel .bulk-pricing-panel{margin:16px 0;padding:14px;border:1px solid var(--border,#e4e8ee);border-radius:12px;background:#f8fafc}
+#pricingPanel .bulk-pricing-panel h3{margin:0 0 5px;font-size:1rem}
+#pricingPanel .bulk-pricing-panel p{margin:0 0 12px;color:#778195;font-size:.85rem}
+#pricingPanel .bulk-pricing-controls{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) minmax(140px,1.1fr) minmax(150px,1fr) auto;align-items:end;gap:10px}
+#pricingPanel .bulk-pricing-controls .field{min-width:0;margin:0}
+#pricingPanel .bulk-pricing-controls input,#pricingPanel .bulk-pricing-controls select{width:100%;min-width:0;box-sizing:border-box}
+#pricingPanel .bulk-pricing-controls button{white-space:normal}
+#pricingPanel #bulkPricingStatus{font-size:.82rem;margin-top:8px;color:#536176}
+@media(max-width:1100px) and (min-width:761px){#pricingPanel .pricing-table-wrap .data-table{font-size:.68rem}#pricingPanel .pricing-table-wrap .data-table th,#pricingPanel .pricing-table-wrap .data-table td{padding:7px 3px}#pricingPanel .pricing-table-wrap .data-table input:not([type=checkbox]),#pricingPanel .pricing-table-wrap .data-table select{font-size:.66rem;padding:5px 2px}#pricingPanel .pricing-table-wrap .data-table td:nth-child(10) .btn{font-size:.63rem;padding:5px 2px}#pricingPanel .bulk-pricing-controls{grid-template-columns:repeat(2,minmax(0,1fr))}#pricingPanel .bulk-pricing-controls button{grid-column:1/-1}}
+@media(max-width:760px){
+ #pricingPanel .pricing-table-wrap{overflow:visible}
+ #pricingPanel .pricing-table-wrap .data-table,#pricingPanel .pricing-table-wrap .data-table tbody,#pricingPanel .pricing-table-wrap .data-table tr{display:block;width:100%}
+ #pricingPanel .pricing-table-wrap .data-table thead{display:none}
+ #pricingPanel .pricing-table-wrap .data-table tbody tr{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0 10px;border:1px solid var(--border,#e4e8ee);border-radius:12px;margin-bottom:12px;padding:8px;background:#fff}
+ #pricingPanel .pricing-table-wrap .data-table td{display:flex;flex-direction:column;gap:4px;width:auto!important;min-width:0;border-bottom:1px solid #edf0f4;padding:8px 4px;overflow-wrap:anywhere}
+ #pricingPanel .pricing-table-wrap .data-table td::before{color:#778195;font-size:.68rem;font-weight:700}
+ #pricingPanel .pricing-table-wrap .data-table td:nth-child(1){grid-column:1/-1;flex-direction:row;align-items:center}
+ #pricingPanel .pricing-table-wrap .data-table td:nth-child(1)::before{content:'নির্বাচন'}
+ #pricingPanel .pricing-table-wrap .data-table td:nth-child(2){grid-column:1/-1}
+ #pricingPanel .pricing-table-wrap .data-table td:nth-child(2)::before{content:'পণ্য'}
+ #pricingPanel .pricing-table-wrap .data-table td:nth-child(3)::before{content:'Cost'}
+ #pricingPanel .pricing-table-wrap .data-table td:nth-child(4)::before{content:'প্যাকেজিং খরচ'}
+ #pricingPanel .pricing-table-wrap .data-table td:nth-child(5)::before{content:'বেস প্রাইস'}
+ #pricingPanel .pricing-table-wrap .data-table td:nth-child(6)::before{content:'লাভের ধরন'}
+ #pricingPanel .pricing-table-wrap .data-table td:nth-child(7)::before{content:'লাভের মান'}
+ #pricingPanel .pricing-table-wrap .data-table td:nth-child(8)::before{content:'নিজস্ব দাম'}
+ #pricingPanel .pricing-table-wrap .data-table td:nth-child(9)::before{content:'বিক্রয়মূল্য'}
+ #pricingPanel .pricing-table-wrap .data-table td:nth-child(10)::before{content:'অ্যাকশন'}
+ #pricingPanel .pricing-table-wrap .data-table td:nth-child(2) small{font-size:.62rem}
+ #pricingPanel .pricing-table-wrap .data-table input:not([type=checkbox]),#pricingPanel .pricing-table-wrap .data-table select{padding:6px 4px;font-size:.75rem}
+ #pricingPanel .pricing-table-wrap .data-table td:nth-child(10) .btn{white-space:normal;overflow-wrap:anywhere}
+ #pricingPanel .bulk-pricing-controls{grid-template-columns:repeat(2,minmax(0,1fr))}
+ #pricingPanel .bulk-pricing-controls button{grid-column:1/-1}
 }
-#pricingPanel .pricing-table-wrap .data-table {
-  width: 100%;
-  min-width: 0;
-  table-layout: fixed;
-  white-space: normal;
-  font-size: .78rem;
-}
-#pricingPanel .pricing-table-wrap .data-table th,
-#pricingPanel .pricing-table-wrap .data-table td {
-  min-width: 0;
-  padding: 9px 6px;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  vertical-align: middle;
-}
-/* Column widths add up to 100%; the product name gets the most space. */
-#pricingPanel .pricing-table-wrap .data-table th:nth-child(1),
-#pricingPanel .pricing-table-wrap .data-table td:nth-child(1) { width: 27%; }
-#pricingPanel .pricing-table-wrap .data-table th:nth-child(2),
-#pricingPanel .pricing-table-wrap .data-table td:nth-child(2) { width: 8%; }
-#pricingPanel .pricing-table-wrap .data-table th:nth-child(3),
-#pricingPanel .pricing-table-wrap .data-table td:nth-child(3) { width: 9%; }
-#pricingPanel .pricing-table-wrap .data-table th:nth-child(4),
-#pricingPanel .pricing-table-wrap .data-table td:nth-child(4) { width: 10%; }
-#pricingPanel .pricing-table-wrap .data-table th:nth-child(5),
-#pricingPanel .pricing-table-wrap .data-table td:nth-child(5) { width: 9%; }
-#pricingPanel .pricing-table-wrap .data-table th:nth-child(6),
-#pricingPanel .pricing-table-wrap .data-table td:nth-child(6) { width: 12%; }
-#pricingPanel .pricing-table-wrap .data-table th:nth-child(7),
-#pricingPanel .pricing-table-wrap .data-table td:nth-child(7) { width: 15%; }
-#pricingPanel .pricing-table-wrap .data-table th:nth-child(8),
-#pricingPanel .pricing-table-wrap .data-table td:nth-child(8) { width: 10%; }
-#pricingPanel .pricing-table-wrap .data-table td:first-child strong {
-  display: block;
-  white-space: normal;
-  overflow-wrap: anywhere;
-  word-break: normal;
-  line-height: 1.45;
-}
-#pricingPanel .pricing-table-wrap .data-table td:first-child small {
-  display: block;
-  margin-top: 3px;
-  font-size: .66rem;
-  color: #7e899b;
-  overflow-wrap: anywhere;
-}
-#pricingPanel .pricing-table-wrap .data-table input,
-#pricingPanel .pricing-table-wrap .data-table select {
-  display: block;
-  width: 100%;
-  min-width: 0;
-  max-width: 100%;
-  padding: 6px 4px;
-  font-size: .77rem;
-  border-radius: 7px;
-}
-#pricingPanel .pricing-table-wrap .data-table td:nth-child(7) small {
-  display: block;
-  margin-top: 3px;
-  line-height: 1.35;
-  font-size: .69rem;
-  overflow-wrap: anywhere;
-}
-#pricingPanel .pricing-table-wrap .data-table td:nth-child(8) .btn {
-  max-width: 100%;
-  min-height: 31px;
-  padding: 6px 7px;
-  font-size: .73rem;
-  white-space: nowrap;
-}
-@media (max-width: 1100px) and (min-width: 761px) {
-  #pricingPanel .pricing-table-wrap .data-table { font-size: .72rem; }
-  #pricingPanel .pricing-table-wrap .data-table th,
-  #pricingPanel .pricing-table-wrap .data-table td { padding: 8px 4px; }
-  #pricingPanel .pricing-table-wrap .data-table td:nth-child(8) .btn { padding: 5px 4px; font-size: .68rem; }
-}
-/* On narrow phones, show one pricing item as a labelled card instead of a slider. */
-@media (max-width: 760px) {
-  #pricingPanel .pricing-table-wrap { overflow: visible; }
-  #pricingPanel .pricing-table-wrap .data-table,
-  #pricingPanel .pricing-table-wrap .data-table tbody,
-  #pricingPanel .pricing-table-wrap .data-table tr { display: block; width: 100%; }
-  #pricingPanel .pricing-table-wrap .data-table thead { display: none; }
-  #pricingPanel .pricing-table-wrap .data-table tbody tr {
-    display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 0 10px;
-    border: 1px solid var(--border, #e4e8ee);
-    border-radius: 12px;
-    margin-bottom: 12px;
-    padding: 8px;
-    background: #fff;
-  }
-  #pricingPanel .pricing-table-wrap .data-table td {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-    width: auto !important;
-    min-width: 0;
-    border-bottom: 1px solid #edf0f4;
-    padding: 8px 4px;
-    overflow-wrap: anywhere;
-  }
-  #pricingPanel .pricing-table-wrap .data-table td::before {
-    color: #778195;
-    font-size: .68rem;
-    font-weight: 700;
-  }
-  #pricingPanel .pricing-table-wrap .data-table td:nth-child(1) { grid-column: 1 / -1; }
-  #pricingPanel .pricing-table-wrap .data-table td:nth-child(1)::before { content: 'পণ্য'; }
-  #pricingPanel .pricing-table-wrap .data-table td:nth-child(2)::before { content: 'Cost'; }
-  #pricingPanel .pricing-table-wrap .data-table td:nth-child(3)::before { content: 'বেস প্রাইস'; }
-  #pricingPanel .pricing-table-wrap .data-table td:nth-child(4)::before { content: 'লাভের ধরন'; }
-  #pricingPanel .pricing-table-wrap .data-table td:nth-child(5)::before { content: 'লাভের মান'; }
-  #pricingPanel .pricing-table-wrap .data-table td:nth-child(6)::before { content: 'নিজস্ব দাম'; }
-  #pricingPanel .pricing-table-wrap .data-table td:nth-child(7)::before { content: 'বিক্রয়মূল্য'; }
-  #pricingPanel .pricing-table-wrap .data-table td:nth-child(8)::before { content: 'অ্যাকশন'; }
-  #pricingPanel .pricing-table-wrap .data-table td:first-child small { font-size: .62rem; }
-  #pricingPanel .pricing-table-wrap .data-table input,
-  #pricingPanel .pricing-table-wrap .data-table select { padding: 6px 4px; font-size: .75rem; }
-  #pricingPanel .pricing-table-wrap .data-table td:nth-child(8) .btn { white-space: normal; overflow-wrap: anywhere; }
-}
-
 </style>
 </head>
 <body class="admin-body"><header class="admin-topbar"><a class="brand" href="/"><span class="brand-mark">DD</span><span>Daily Deals <b>BD</b><small>ADMIN CONSOLE</small></span></a><div class="admin-top-actions"><span id="adminIdentity" class="muted">অ্যাডমিন যাচাই হচ্ছে...</span><button id="adminLogout" class="btn btn-outline btn-small">লগআউট</button></div></header>
@@ -144,6 +66,28 @@
 <form id="manualProductForm" class="form-grid settings-grid"><input type="hidden" name="productId"><label class="field">পণ্যের নাম *<input name="name" required maxlength="160" placeholder="যেমন: Wireless Earbuds K8"></label><label class="field">ক্যাটাগরি *<input name="category" required maxlength="80" placeholder="Gadgets / Clothing"></label><label class="field full">বর্ণনা<textarea name="description" rows="3" maxlength="2000" placeholder="পণ্যের বিস্তারিত বর্ণনা"></textarea></label><label class="field">বিক্রয়মূল্য (৳) *<input name="price" type="number" min="1" step="1" required></label><label class="field">স্টক সংখ্যা *<input name="stockQuantity" type="number" min="0" max="100000" step="1" required value="1"></label><label class="field full">ছবির URL *<textarea name="imageUrls" rows="2" required placeholder="এক বা একাধিক image URL দিন; প্রতিটি আলাদা লাইনে"></textarea><small>পণ্য ছবি আগে কোনো image host-এ আপলোড করে তার সরাসরি URL এখানে দিন।</small></label><label class="checkbox-label"><input type="checkbox" name="active" checked> ওয়েবসাইটে প্রকাশ করুন</label><div class="admin-order-actions"><button class="btn btn-primary" type="submit" id="saveManualProduct">ম্যানুয়াল পণ্য সংরক্ষণ</button><button class="btn btn-outline hidden" type="button" id="cancelManualEdit">সম্পাদনা বাতিল</button></div></form>
 <div class="divider-line"></div><div class="pricing-table-wrap"><table class="data-table"><thead><tr><th>পণ্য</th><th>উৎস</th><th>বিক্রয়মূল্য</th><th>স্টক</th><th>অবস্থা</th><th>অ্যাকশন</th></tr></thead><tbody id="productRows"><tr><td colspan="6">Firebase থেকে পণ্য লোড হচ্ছে...</td></tr></tbody></table></div></section>
 <section id="ordersPanel" class="panel admin-panel hidden"><div class="panel-heading"><div><h2>অর্ডার রিভিউ</h2><p class="muted">অর্ডার Firestore-এ জমা হবে। আপনি কনফার্ম করলেই কেবল Business Koro-র পণ্য API-তে পাঠানো হবে; ম্যানুয়াল পণ্য API-তে পাঠানো হবে না।</p></div><select id="orderFilter" aria-label="অর্ডার ফিল্টার"><option value="review">রিভিউ বাকি</option><option value="all">সব অর্ডার</option><option value="sent">পাঠানো হয়েছে</option><option value="failed">সমস্যা হয়েছে</option></select></div><div class="bulk-actions"><label class="checkbox-label"><input id="selectAllOrders" type="checkbox"> সব নির্বাচন</label><button id="mergeOrders" class="btn btn-outline btn-small">নির্বাচিত অর্ডার Merge</button></div><div id="adminOrders" class="admin-order-list"><div class="status-message"><span class="spinner"></span> অর্ডার লোড হচ্ছে...</div></div></section>
-<section id="pricingPanel" class="panel admin-panel hidden"><div class="panel-heading"><div><h2>প্রাইসিং নিয়ম</h2><p class="muted">Business Koro Cost Price + ৳৩০ প্যাকেজিং; তারপর নির্ধারিত লাভ। Cost Price শুধু অ্যাডমিন দেখতে পাবেন।</p></div></div><form id="settingsPricingForm" class="form-grid settings-grid"><label class="field">ডিফল্ট লাভের নিয়ম<select name="pricingMode"><option value="percent">শতকরা লাভ (%)</option><option value="fixed">নির্দিষ্ট টাকা (৳)</option></select></label><label class="field">ডিফল্ট লাভের পরিমাণ<input name="profitValue" type="number" min="0" step="1" required value="20"></label><label class="field">প্যাকেজিং খরচ<input name="packagingCost" type="number" min="30" step="1" required value="30" readonly><small>প্রতি পণ্যে প্যাকেজিং খরচ ৳৩০।</small></label><button class="btn btn-primary" type="submit">ডিফল্ট প্রাইসিং সংরক্ষণ</button></form><div class="divider-line"></div><h3>Business Koro পণ্যভিত্তিক লাভ</h3><div class="pricing-table-wrap"><table class="data-table"><thead><tr><th>পণ্য</th><th>Cost</th><th>বেস প্রাইস</th><th>লাভের ধরন</th><th>লাভের মান</th><th>নিজস্ব দাম (ঐচ্ছিক)</th><th>বিক্রয়মূল্য</th><th>সংরক্ষণ</th></tr></thead><tbody id="pricingRows"><tr><td colspan="8">প্রোডাক্ট লোড হচ্ছে...</td></tr></tbody></table></div></section>
+<section id="pricingPanel" class="panel admin-panel hidden">
+<div class="panel-heading"><div><h2>প্রাইসিং নিয়ম</h2><p class="muted">উপরের ডিফল্ট নিয়ম শুধু নতুন/সিঙ্ক হওয়া যেসব পণ্যে নিজস্ব নিয়ম নেই সেগুলোর জন্য। বিদ্যমান পণ্যের দাম বদলাতে নিচে টিক দিয়ে Bulk Pricing প্রয়োগ করুন। প্রতিটি পণ্যের প্যাকেজিং খরচ আলাদা হতে পারে। Cost Price শুধু অ্যাডমিন দেখতে পাবেন।</p></div></div>
+<form id="settingsPricingForm" class="form-grid settings-grid">
+<label class="field">ডিফল্ট লাভের নিয়ম<select name="pricingMode"><option value="percent">শতকরা লাভ (%)</option><option value="fixed">নির্দিষ্ট টাকা (৳)</option></select></label>
+<label class="field">ডিফল্ট লাভের পরিমাণ<input name="profitValue" type="number" min="0" step="1" required value="20"></label>
+<label class="field">ডিফল্ট প্যাকেজিং খরচ (৳)<input name="packagingCost" type="number" min="0" step="1" required value="30"><small>এটি ডিফল্ট মাত্র; পণ্যের আলাদা খরচ Bulk Pricing বা সারির ঘর থেকে দিন।</small></label>
+<button class="btn btn-primary" type="submit">ডিফল্ট নিয়ম সংরক্ষণ</button>
+</form>
+<div class="divider-line"></div><h3>Business Koro পণ্যভিত্তিক প্রাইসিং</h3>
+<div class="bulk-pricing-panel">
+<h3>Bulk Pricing — শুধু টিক দেওয়া পণ্যে</h3>
+<p>যে পণ্যগুলোর বাম পাশে টিক দেবেন শুধু সেগুলোর লাভের নিয়ম ও প্যাকেজিং খরচ বদলাবে। টিক না দেওয়া পণ্যের দাম অপরিবর্তিত থাকবে।</p>
+<div class="bulk-pricing-controls">
+<label class="field">লাভের ধরন<select id="bulkPricingMode"><option value="percent">লাভের শতাংশ (%)</option><option value="fixed">প্রতি পণ্যে নির্দিষ্ট লাভ (৳)</option></select></label>
+<label class="field">লাভের পরিমাণ<input id="bulkProfitValue" type="number" min="0" step="1" value="20" inputmode="decimal"></label>
+<label class="field">একই প্যাকেজিং খরচ (৳)<input id="bulkPackagingCost" type="number" min="0" step="1" value="" placeholder="যেমন ৪০" inputmode="decimal" disabled></label>
+<label class="checkbox-label"><input id="bulkOverridePackaging" type="checkbox"> নির্বাচিত সব পণ্যে এই প্যাকেজিং খরচ দিন</label>
+<div class="field"><span id="pricingSelectedCount">০টি পণ্য নির্বাচন করা হয়েছে</span><small>টিক না দেওয়া পণ্য বদলাবে না</small></div>
+<button id="applyBulkPricing" class="btn btn-primary" type="button">নির্বাচিত পণ্যে প্রয়োগ ও সংরক্ষণ</button>
+</div><div id="bulkPricingStatus" role="status"></div>
+</div>
+<div class="pricing-table-wrap"><table class="data-table"><thead><tr><th><input id="selectAllPricing" type="checkbox" aria-label="সব পণ্য নির্বাচন"></th><th>পণ্য</th><th>Cost</th><th>প্যাকেজিং</th><th>বেস প্রাইস</th><th>লাভের ধরন</th><th>লাভের মান</th><th>নিজস্ব দাম</th><th>বিক্রয়মূল্য</th><th>অ্যাকশন</th></tr></thead><tbody id="pricingRows"><tr><td colspan="10">প্রোডাক্ট লোড হচ্ছে...</td></tr></tbody></table></div>
+</section>
 <section id="settingsPanel" class="panel admin-panel hidden"><div class="panel-heading"><div><h2>স্টোর সেটিংস</h2><p class="muted">ডেলিভারি চার্জ ও ম্যানুয়াল পেমেন্ট নির্দেশনা Firebase-এ সংরক্ষণ হবে।</p></div></div><form id="storeSettingsForm" class="form-grid settings-grid"><label class="field">ঢাকা সিটির ভিতরে ডেলিভারি (৳)<input name="deliveryInsideDhaka" type="number" min="0" required value="80"></label><label class="field">ঢাকা সিটির বাইরে ডেলিভারি (৳)<input name="deliveryOutsideDhaka" type="number" min="0" required value="130"></label><label class="field full">bKash / Nagad / ব্যাংক পেমেন্ট নির্দেশনা<textarea name="paymentInstructions" rows="4" maxlength="2000" placeholder="আপনার পেমেন্ট পদ্ধতি ও নির্দেশনা লিখুন"></textarea></label><button class="btn btn-primary" type="submit">স্টোর সেটিংস সংরক্ষণ</button></form><div class="divider-line"></div><div class="note-box"><strong>Business Koro সিকিউর সংযোগ</strong><p id="apiStatus" class="muted">কনফিগারেশন যাচাই হচ্ছে...</p><p class="small-note">API Key Cloudflare Worker Secret-এ থাকবে। পণ্য ও অর্ডারের সাধারণ ডেটা Firebase-এ থাকবে।</p></div></section>
 </div></main><footer class="site-footer"><div class="container footer-inner"><p>Daily Deals BD Admin · Private control panel</p><a href="/">শপ দেখুন</a></div></footer><div id="toast" class="toast" role="status"></div></body></html>
