@@ -1,78 +1,209 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    function signedIn() { return request.auth != null; }
-    // An owner-created admins/{uid} document with role='admin' authorizes the UI/rules.
-    // Client rules never let users create or edit these admin documents.
+    function signedIn() {
+      return request.auth != null;
+    }
+
     function isAdmin() {
       return signedIn()
         && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
         && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'admin';
     }
+
+    function validOrderCoupon(d) {
+      // Orders without coupon data may be placed by guests. If any coupon field is
+      // present, require a signed-in owner, the complete coupon payload, and a valid coupon.
+      return !d.keys().hasAny(['couponId', 'couponCode', 'couponDiscount', 'couponProductIds'])
+        || (d.keys().hasAll(['couponId', 'couponCode', 'couponDiscount', 'couponProductIds', 'productIds', 'totalQuantity'])
+          && signedIn() && d.customerUid == request.auth.uid
+          && d.couponId is string && d.couponCode is string
+          && d.couponDiscount is number && d.couponDiscount >= 0 && d.couponDiscount <= d.subtotal
+          && d.couponProductIds is list
+          && d.productIds is list
+          && exists(/databases/$(database)/documents/coupons/$(d.couponId))
+          && get(/databases/$(database)/documents/coupons/$(d.couponId)).data.active == true
+          && get(/databases/$(database)/documents/coupons/$(d.couponId)).data.code == d.couponCode
+          // Coupon product IDs must match the saved coupon. A targeted coupon must
+          // match at least one product in the order. Exact eligible-line totals are
+          // additionally rechecked in Admin Review before accepting the order.
+          && ((!get(/databases/$(database)/documents/coupons/$(d.couponId)).data.keys().hasAny(['productIds'])
+                && d.couponProductIds.size() == 0)
+            || (get(/databases/$(database)/documents/coupons/$(d.couponId)).data.keys().hasAny(['productIds'])
+                && d.couponProductIds == get(/databases/$(database)/documents/coupons/$(d.couponId)).data.productIds
+                && (get(/databases/$(database)/documents/coupons/$(d.couponId)).data.productIds.size() == 0
+                    || d.productIds.hasAny(get(/databases/$(database)/documents/coupons/$(d.couponId)).data.productIds))))
+          && d.subtotal >= get(/databases/$(database)/documents/coupons/$(d.couponId)).data.minimumOrder
+          && (!get(/databases/$(database)/documents/coupons/$(d.couponId)).data.keys().hasAny(['minimumQuantity'])
+            || (d.totalQuantity is number
+              && d.totalQuantity >= get(/databases/$(database)/documents/coupons/$(d.couponId)).data.minimumQuantity))
+          && (!get(/databases/$(database)/documents/coupons/$(d.couponId)).data.keys().hasAny(['expiresAt'])
+            || get(/databases/$(database)/documents/coupons/$(d.couponId)).data.expiresAt == null
+            || get(/databases/$(database)/documents/coupons/$(d.couponId)).data.expiresAt > request.time)
+          && (!get(/databases/$(database)/documents/coupons/$(d.couponId)).data.keys().hasAny(['usageLimit'])
+            || get(/databases/$(database)/documents/coupons/$(d.couponId)).data.usageLimit == null
+            || get(/databases/$(database)/documents/coupons/$(d.couponId)).data.usedCount < get(/databases/$(database)/documents/coupons/$(d.couponId)).data.usageLimit)
+          && ((get(/databases/$(database)/documents/coupons/$(d.couponId)).data.discountType == 'percent'
+                && d.couponDiscount <= d.subtotal * get(/databases/$(database)/documents/coupons/$(d.couponId)).data.discountValue / 100)
+            || (get(/databases/$(database)/documents/coupons/$(d.couponId)).data.discountType == 'fixed'
+                && d.couponDiscount <= get(/databases/$(database)/documents/coupons/$(d.couponId)).data.discountValue)));
+    }
+
+    function validCustomerReview() {
+      let d = request.resource.data;
+      let orderPath = /databases/$(database)/documents/orders/$(d.orderId);
+      return d.keys().hasOnly(['productId', 'productName', 'userId', 'customerName', 'rating', 'title', 'body', 'orderId', 'source', 'status', 'createdAt', 'updatedAt'])
+        && d.keys().hasAll(['productId', 'userId', 'customerName', 'rating', 'body', 'orderId', 'source', 'status', 'createdAt', 'updatedAt'])
+        && d.productId is string && d.productId.size() > 0 && d.productId.size() <= 150
+        && d.userId == request.auth.uid
+        && d.customerName is string && d.customerName.size() >= 2 && d.customerName.size() <= 100
+        && d.rating is int && d.rating >= 1 && d.rating <= 5
+        && d.body is string && d.body.size() >= 5 && d.body.size() <= 1500
+        && (!d.keys().hasAny(['title']) || (d.title is string && d.title.size() <= 100))
+        && d.orderId is string && d.source == 'customer' && d.status == 'pending'
+        && exists(orderPath)
+        && get(orderPath).data.customerUid == request.auth.uid
+        && get(orderPath).data.keys().hasAny(['productIds'])
+        && get(orderPath).data.productIds is list
+        && get(orderPath).data.productIds.hasAny([d.productId])
+        && get(orderPath).data.status in ['sent', 'partially_fulfilled', 'confirmed_manual', 'delivered', 'completed'];
+    }
+
     function validNewOrder() {
       let d = request.resource.data;
       return d.keys().hasAll([
-        'orderNumber','customerUid','customerEmail','customerName','customerPhone',
-        'customerDivision','customerDistrict','customerArea','customerAddress','deliveryZone',
-        'customerNote','items','subtotal','deliveryCharge','total','paymentMethod',
-        'paymentReference','paymentStatus','status','isMerged','mergedInto',
-        'sourceOrderIds','businessSubmission','adminNote','createdAt','updatedAt'
+        'orderNumber', 'customerUid', 'customerEmail', 'customerName', 'customerPhone',
+        'customerDivision', 'customerDistrict', 'customerArea', 'customerAddress', 'deliveryZone',
+        'customerNote', 'items', 'totalQuantity', 'subtotal', 'deliveryCharge', 'total', 'paymentMethod',
+        'paymentReference', 'paymentStatus', 'status', 'isMerged', 'mergedInto',
+        'sourceOrderIds', 'businessSubmission', 'adminNote', 'createdAt', 'updatedAt'
       ])
       && d.orderNumber is string && d.orderNumber.size() >= 6 && d.orderNumber.size() <= 60
+      && d.customerEmail is string && d.customerEmail.size() <= 254
       && d.customerName is string && d.customerName.size() >= 2 && d.customerName.size() <= 100
       && d.customerPhone is string && d.customerPhone.size() >= 8 && d.customerPhone.size() <= 20
       && d.customerDivision is string && d.customerDivision.size() > 0 && d.customerDivision.size() <= 80
       && d.customerDistrict is string && d.customerDistrict.size() > 0 && d.customerDistrict.size() <= 80
-      && d.customerArea is string && d.customerArea.size() > 0 && d.customerArea.size() <= 200
+      && d.customerArea is string && d.customerArea.size() > 0 && d.customerArea.size() <= 120
       && d.customerAddress is string && d.customerAddress.size() > 0 && d.customerAddress.size() <= 500
-      && d.deliveryZone in ['dhaka_city','outside_dhaka_city']
-      && d.paymentMethod in ['cod','bkash','nagad','bank']
-      && d.paymentStatus in ['not_required','pending','verified']
+      && d.customerNote is string && d.customerNote.size() <= 500
+      && d.deliveryZone in ['dhaka_city', 'outside_dhaka_city']
+      && ((d.deliveryZone == 'dhaka_city' && d.customerDivision == 'Dhaka' && d.customerDistrict == 'Dhaka')
+          || (d.deliveryZone == 'outside_dhaka_city' && !(d.customerDivision == 'Dhaka' && d.customerDistrict == 'Dhaka')))
+      // Supports the current checkout: representative confirms order/payment by phone.
+      && d.paymentMethod in ['contact_after_order', 'cod', 'bkash', 'nagad', 'bank']
+      && d.paymentReference is string && d.paymentReference.size() <= 500
+      && d.paymentStatus in ['pending_contact', 'not_required', 'pending', 'verified']
       && d.status == 'pending_review'
+      && d.isMerged == false
+      && d.mergedInto == null
+      && d.sourceOrderIds is list && d.sourceOrderIds.size() == 0
+      && d.businessSubmission is map && d.businessSubmission.keys().size() == 0
+      && d.adminNote is string && d.adminNote.size() == 0
       && d.items is list && d.items.size() > 0 && d.items.size() <= 20
+      && d.totalQuantity is number && d.totalQuantity >= d.items.size() && d.totalQuantity <= 400
+      && (!d.keys().hasAny(['productIds']) || (d.productIds is list && d.productIds.size() == d.items.size() && d.productIds.size() <= 20))
       && d.subtotal is number && d.subtotal >= 0 && d.subtotal <= 100000000
       && d.deliveryCharge is number && d.deliveryCharge >= 0 && d.deliveryCharge <= 100000
-      && d.total is number && d.total >= d.subtotal && d.total <= 100100000
+      && d.total is number
+      && ((d.keys().hasAny(['couponId']) && d.total == d.subtotal - d.couponDiscount + d.deliveryCharge)
+          || (!d.keys().hasAny(['couponId']) && d.total == d.subtotal + d.deliveryCharge))
+      && validOrderCoupon(d)
       && ((signedIn() && d.customerUid == request.auth.uid) || (!signedIn() && d.customerUid == null));
     }
 
-    // Public product catalogue. Supplier cost/private pricing is kept in product_private.
+    function validUserProfile(userId) {
+      let d = request.resource.data;
+      return d.keys().hasOnly([
+        'uid', 'email', 'displayName', 'photoURL', 'providerIds', 'emailVerified',
+        'createdAt', 'updatedAt', 'lastLoginAt', 'phone', 'customerPhone',
+        'address', 'customerAddress', 'division', 'district', 'area',
+        'customerDivision', 'customerDistrict', 'customerArea', 'postalCode'
+      ])
+      && d.keys().hasAll(['uid', 'email', 'providerIds', 'emailVerified', 'updatedAt', 'lastLoginAt'])
+      && d.uid == userId
+      && d.email is string && d.email.size() <= 254
+      && d.providerIds is list
+      && d.emailVerified is bool;
+    }
+
+    // Public catalogue. Only published active products are readable without admin access.
     match /products/{productId} {
       allow read: if isAdmin() || resource.data.active == true;
       allow create, update, delete: if isAdmin();
     }
 
-    // Never expose supplier cost prices and private source data to shoppers.
+    // Actual collection name is product_private (singular). Supplier cost/profit is admin-only.
     match /product_private/{productId} {
-      allow read, write: if isAdmin();
+      allow read, create, update, delete: if isAdmin();
     }
 
-    // Store settings contain public delivery/payment instructions and default pricing controls only.
+    // Public storefront document only. Keep pricingMode/profitValue/packagingCost out of this doc.
+    // If legacy private fields are present, public reads stay blocked until the admin migration removes them.
     match /settings/{settingId} {
-      allow read: if true;
+      allow read: if isAdmin() || settingId == 'site' || (
+        settingId == 'store'
+        && !resource.data.keys().hasAny(['pricingMode', 'profitValue', 'packagingCost'])
+      );
       allow create, update, delete: if isAdmin();
     }
 
-    // Guest customers may create a pending order, but cannot read any order.
-    // Logged-in customers may read only their own orders; only the admin may modify orders.
+    // Private business-wide pricing defaults live here; never readable by shoppers.
+    match /settings_private/{settingId} {
+      allow read, create, update, delete: if isAdmin();
+    }
+
+    // Customers can create only an unmerged, pending-review order. Admin can create merged orders.
+    // Only the admin may update/delete an order; customers can read their own orders when signed in.
     match /orders/{orderId} {
-      allow create: if validNewOrder();
+      allow create: if isAdmin() || validNewOrder();
       allow read: if isAdmin() || (signedIn() && resource.data.customerUid == request.auth.uid);
       allow update, delete: if isAdmin();
     }
 
+    // Owner profile only. Protected keys (role/admin/permissions) are deliberately not allowed.
     match /users/{userId} {
-      allow read, create, update: if isAdmin() || (signedIn() && request.auth.uid == userId);
+      allow read: if isAdmin() || (signedIn() && request.auth.uid == userId);
+      allow create: if isAdmin() || (signedIn() && request.auth.uid == userId && validUserProfile(userId));
+      allow update: if isAdmin() || (
+        signedIn()
+        && request.auth.uid == userId
+        && validUserProfile(userId)
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+          'email', 'displayName', 'photoURL', 'providerIds', 'emailVerified',
+          'updatedAt', 'lastLoginAt', 'phone', 'customerPhone', 'address',
+          'customerAddress', 'division', 'district', 'area', 'customerDivision',
+          'customerDistrict', 'customerArea', 'postalCode'
+        ])
+      );
       allow delete: if isAdmin();
     }
 
+    // Coupons: shoppers may read only active, unexpired coupons; only Admin can create/update/use counters.
+    match /coupons/{couponId} {
+      // Shoppers can look up a known coupon code, but cannot list every promotion.
+      allow get: if isAdmin() || (resource.data.active == true
+        && (!resource.data.keys().hasAny(['expiresAt']) || resource.data.expiresAt == null || resource.data.expiresAt > request.time));
+      allow list: if isAdmin();
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Reviews: only approved reviews are public. Customers can submit pending reviews linked to their own confirmed order.
+    // Admin manually checks the product/order before publishing.
+    match /reviews/{reviewId} {
+      allow read: if isAdmin() || resource.data.status == 'published'
+        || (signedIn() && resource.data.userId == request.auth.uid);
+      allow create: if isAdmin() || (signedIn() && validCustomerReview());
+      allow update, delete: if isAdmin();
+    }
+
+    // Admin identity documents must be created/maintained manually by the project owner.
     match /admins/{adminId} {
       allow get: if (signedIn() && request.auth.uid == adminId && resource.data.role == 'admin') || isAdmin();
       allow list: if isAdmin();
       allow create, update, delete: if false;
     }
 
-    // Default deny for all other collections.
     match /{document=**} {
       allow read, write: if false;
     }

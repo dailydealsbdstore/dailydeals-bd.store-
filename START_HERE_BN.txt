@@ -9,6 +9,7 @@ DAILY DEALS BD — আগে এটি পড়ুন
 
 কাজের ক্রম:
 A. docs/DEPLOYMENT_FIREBASE_FIRST_BN.md খুলুন।
+A2. SEO/Google Analytics/Search Console ও Firestore rollout-এর জন্য docs/SEO_ANALYTICS_FIRESTORE_NEXT_STEPS_BN.md পড়ুন।
 B. Firestore database + rules + admins/{আপনার Admin UID} doc ঠিক করুন।
 C. Cloudflare Worker-এ worker/src/index.js deploy করুন এবং আগের secrets রেখে দিন।
 D. public/ ফোল্ডারের নির্দেশিত files GitHub repository-তে একই path-এ update করুন।

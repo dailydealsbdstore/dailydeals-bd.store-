@@ -1,0 +1,80 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() { return request.auth != null; }
+    // An owner-created admins/{uid} document with role='admin' authorizes the UI/rules.
+    // Client rules never let users create or edit these admin documents.
+    function isAdmin() {
+      return signedIn()
+        && exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+        && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'admin';
+    }
+    function validNewOrder() {
+      let d = request.resource.data;
+      return d.keys().hasAll([
+        'orderNumber','customerUid','customerEmail','customerName','customerPhone',
+        'customerDivision','customerDistrict','customerArea','customerAddress','deliveryZone',
+        'customerNote','items','subtotal','deliveryCharge','total','paymentMethod',
+        'paymentReference','paymentStatus','status','isMerged','mergedInto',
+        'sourceOrderIds','businessSubmission','adminNote','createdAt','updatedAt'
+      ])
+      && d.orderNumber is string && d.orderNumber.size() >= 6 && d.orderNumber.size() <= 60
+      && d.customerName is string && d.customerName.size() >= 2 && d.customerName.size() <= 100
+      && d.customerPhone is string && d.customerPhone.size() >= 8 && d.customerPhone.size() <= 20
+      && d.customerDivision is string && d.customerDivision.size() > 0 && d.customerDivision.size() <= 80
+      && d.customerDistrict is string && d.customerDistrict.size() > 0 && d.customerDistrict.size() <= 80
+      && d.customerArea is string && d.customerArea.size() > 0 && d.customerArea.size() <= 200
+      && d.customerAddress is string && d.customerAddress.size() > 0 && d.customerAddress.size() <= 500
+      && d.deliveryZone in ['dhaka_city','outside_dhaka_city']
+      && d.paymentMethod in ['cod','bkash','nagad','bank']
+      && d.paymentStatus in ['not_required','pending','verified']
+      && d.status == 'pending_review'
+      && d.items is list && d.items.size() > 0 && d.items.size() <= 20
+      && d.subtotal is number && d.subtotal >= 0 && d.subtotal <= 100000000
+      && d.deliveryCharge is number && d.deliveryCharge >= 0 && d.deliveryCharge <= 100000
+      && d.total is number && d.total >= d.subtotal && d.total <= 100100000
+      && ((signedIn() && d.customerUid == request.auth.uid) || (!signedIn() && d.customerUid == null));
+    }
+
+    // Public product catalogue. Supplier cost/private pricing is kept in product_private.
+    match /products/{productId} {
+      allow read: if isAdmin() || resource.data.active == true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Never expose supplier cost prices and private source data to shoppers.
+    match /product_private/{productId} {
+      allow read, write: if isAdmin();
+    }
+
+    // Store settings contain public delivery/payment instructions and default pricing controls only.
+    match /settings/{settingId} {
+      allow read: if true;
+      allow create, update, delete: if isAdmin();
+    }
+
+    // Guest customers may create a pending order, but cannot read any order.
+    // Logged-in customers may read only their own orders; only the admin may modify orders.
+    match /orders/{orderId} {
+      allow create: if validNewOrder();
+      allow read: if isAdmin() || (signedIn() && resource.data.customerUid == request.auth.uid);
+      allow update, delete: if isAdmin();
+    }
+
+    match /users/{userId} {
+      allow read, create, update: if isAdmin() || (signedIn() && request.auth.uid == userId);
+      allow delete: if isAdmin();
+    }
+
+    match /admins/{adminId} {
+      allow get: if (signedIn() && request.auth.uid == adminId && resource.data.role == 'admin') || isAdmin();
+      allow list: if isAdmin();
+      allow create, update, delete: if false;
+    }
+
+    // Default deny for all other collections.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1,6 +1,7 @@
 # Daily Deals BD — Firebase-first storefront
 
 বাংলা deployment guide: [`docs/DEPLOYMENT_FIREBASE_FIRST_BN.md`](docs/DEPLOYMENT_FIREBASE_FIRST_BN.md)
+SEO, Analytics ও Firestore rollout guide: [`docs/SEO_ANALYTICS_FIRESTORE_NEXT_STEPS_BN.md`](docs/SEO_ANALYTICS_FIRESTORE_NEXT_STEPS_BN.md)
 
 ## Architecture
 - Firebase Authentication: customer/admin login.
