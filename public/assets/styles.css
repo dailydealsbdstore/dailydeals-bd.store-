@@ -56,3 +56,7 @@
 .price-comparison-detail .sale-price-label{font-size:.82rem}
 .price-comparison-detail .sale-price{margin:0;font-family:Manrope,'Hind Siliguri',sans-serif;font-size:2rem;font-weight:800;color:var(--navy);line-height:1.25}
 @media(max-width:480px){.price-comparison-card{gap:5px}.discount-badge{font-size:.64rem;padding:4px 5px}.price-comparison-card .sale-price{font-size:1.08rem}.market-price{font-size:.7rem}}
+
+/* Product variant details shown under order line items (admin and customer history). */
+.order-item-variant{display:block;padding-left:10px;color:#52627a;font-size:.82rem;line-height:1.55;margin-top:2px}
+.admin-order-line+.admin-order-line{margin-top:5px}
