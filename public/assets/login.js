@@ -40,6 +40,9 @@ document.querySelectorAll('.auth-tab').forEach((button) => {
   button.addEventListener('click', () => setMode(button.dataset.mode));
 });
 
+// Account-prompt links can open the registration tab directly.
+if (new URLSearchParams(location.search).get('mode') === 'register') setMode('register');
+
 function goAfterLogin() {
   const next = new URLSearchParams(location.search).get('next');
   location.href = next && next.startsWith('/') ? next : '/account.html';
