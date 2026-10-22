@@ -1,0 +1,12 @@
+/* Daily Deals BD social footer: standalone stylesheet to avoid changing existing layout CSS. */
+.footer-social-section{display:flex;align-items:center;justify-content:space-between;gap:22px;flex-wrap:wrap;margin-top:20px;padding-top:20px;border-top:1px solid rgba(222,232,250,.16)}
+.footer-social-intro{display:flex;flex-direction:column;gap:4px;min-width:220px}
+.footer-social-intro strong{color:#fff;font-size:.97rem;font-weight:800}
+.footer-social-intro span{color:#a9b5c8;font-size:.78rem;line-height:1.55}
+.footer-social-links{display:flex;align-items:center;justify-content:flex-end;gap:10px;flex-wrap:wrap}
+.footer-social-link{display:inline-flex;align-items:center;gap:8px;min-height:42px;padding:7px 12px;border:1px solid rgba(222,232,250,.2);border-radius:999px;background:rgba(255,255,255,.045);color:#edf3ff;text-decoration:none;font-size:.82rem;font-weight:700;transition:background .18s ease,border-color .18s ease,transform .18s ease}
+.footer-social-link:hover,.footer-social-link:focus-visible{background:rgba(255,255,255,.12);border-color:rgba(255,255,255,.42);transform:translateY(-1px);outline:none}
+.footer-social-link svg{display:block;width:19px;height:19px;flex:0 0 19px;fill:currentColor}
+.footer-social-facebook svg{color:#5d9bff}.footer-social-instagram svg{color:#ff83b8}.footer-social-tiktok svg{color:#fff}.footer-social-whatsapp svg{color:#4ade80}
+@media(max-width:760px){.footer-social-section{align-items:flex-start;flex-direction:column;gap:14px;margin-top:14px;padding-top:17px}.footer-social-links{justify-content:flex-start;gap:8px}.footer-social-link{padding:8px 11px;min-height:40px;font-size:.8rem}.footer-social-intro span{max-width:360px}}
+@media(prefers-reduced-motion:reduce){.footer-social-link{transition:none}}
