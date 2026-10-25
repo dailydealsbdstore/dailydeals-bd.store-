@@ -110,7 +110,7 @@ function maybeOfferAccount(){
 }
 if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',maybeOfferAccount,{once:true});else maybeOfferAccount();
 export function statusLabel(status) {
-  const map = { pending_review:'রিভিউ বাকি', pending_payment:'পেমেন্ট যাচাই বাকি', payment_verified:'পেমেন্ট যাচাই হয়েছে', sending_businesskoro:'অর্ডার প্রসেস হচ্ছে', sent:'অর্ডার নিশ্চিত হয়েছে', partial_failed:'কিছু আইটেম পাঠানো যায়নি', failed:'সমস্যা হয়েছে', rejected:'বাতিল', merged_into:'অন্য অর্ডারের সঙ্গে যুক্ত', confirmed_manual:'ম্যানুয়াল অর্ডার অনুমোদিত', partially_fulfilled:'আংশিক পূরণ হয়েছে', payment_pending:'পেমেন্ট যাচাই বাকি', not_required:'প্রযোজ্য নয়', verified:'যাচাই হয়েছে', paid:'পেমেন্ট সম্পন্ন' };
+  const map = { pending_review:'রিভিউ বাকি', pending_payment:'পেমেন্ট যাচাই বাকি', payment_verified:'পেমেন্ট যাচাই হয়েছে', sending_businesskoro:'অর্ডার নিশ্চিত—সরবরাহকারীকে পাঠানো হচ্ছে', confirmed:'অর্ডার নিশ্চিত হয়েছে', sent:'অর্ডার নিশ্চিত হয়েছে', partial_failed:'কিছু আইটেম পাঠানো যায়নি', failed:'সমস্যা হয়েছে', rejected:'বাতিল', merged_into:'অন্য অর্ডারের সঙ্গে যুক্ত', confirmed_manual:'অর্ডার নিশ্চিত হয়েছে', partially_fulfilled:'আংশিক পূরণ হয়েছে', payment_pending:'পেমেন্ট যাচাই বাকি', not_required:'প্রযোজ্য নয়', verified:'যাচাই হয়েছে', paid:'পেমেন্ট সম্পন্ন' };
   return map[status] || status || 'অজানা';
 }
 export function stockLabel(inStock) { return inStock ? 'স্টকে আছে' : 'স্টক শেষ'; }
