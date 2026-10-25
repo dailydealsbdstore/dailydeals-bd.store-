@@ -66,7 +66,7 @@ service cloud.firestore {
         && get(orderPath).data.keys().hasAny(['productIds'])
         && get(orderPath).data.productIds is list
         && get(orderPath).data.productIds.hasAny([d.productId])
-        && get(orderPath).data.status in ['sent', 'partially_fulfilled', 'confirmed', 'confirmed_manual', 'delivered', 'completed'];
+        && get(orderPath).data.status in ['sent', 'partially_fulfilled', 'confirmed', 'confirmed_manual', 'shipped', 'delivered', 'completed'];
     }
 
     function validNewOrder() {

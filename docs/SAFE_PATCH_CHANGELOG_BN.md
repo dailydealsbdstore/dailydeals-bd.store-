@@ -27,3 +27,18 @@ Google Search indexing, Firebase Rules publish, Cloudflare production deployment
 - Added a Bengali deploy/test guide for the Business Koro product update, separate order confirmation and mobile search changes.
 
 - Align Business Koro Worker payment validation so COD and `contact_after_order` can be submitted after admin approval, while prepaid methods still require payment verification.
+
+
+## 2026-10-25 — অর্ডার স্ট্যাটাস ট্র্যাকিং ও রিভিউ ছবি
+- Order status: pending, confirmed, shipped, delivered/completed; courier, Tracking ID ও optional tracking URL।
+- Customer Account ও Admin orders-এ Firestore onSnapshot live updates।
+- Admin-যোগ করা রিভিউতে image URL/Cloudinary upload এবং product page-এ ছবি প্রদর্শন। Admin-added review স্পষ্টভাবে buyer-verified নয় বলে label করা হয়।
+- Firestore rules customer review eligibility-তে shipped status যোগ।
+
+## 2026-10-25 — Order lifecycle, live tracking & custom review images
+- Customer order lifecycle display: Pending → Confirmed → Shipped → Delivered/Completed, with current stage timestamps where available.
+- Admin order list and signed-in customer order history now use Firestore onSnapshot listeners for live updates.
+- Admin can enter Courier, required Tracking ID, and optional Tracking URL, mark shipped, update tracking details, and mark delivered.
+- Admin-created published reviews can optionally include an HTTPS image URL or Cloudinary upload; public product pages display the image.
+- Admin-added reviews are labelled as not buyer-verified to avoid misrepresenting them as verified customer reviews.
+- Firestore rules: customer review eligibility now recognizes shipped orders.

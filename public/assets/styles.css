@@ -62,3 +62,23 @@
 .admin-order-line+.admin-order-line{margin-top:5px}
 
 .order-supplier-status{display:block;margin-top:5px;font-size:.78rem;font-weight:700;color:#64748b}.order-supplier-status.is-sent{color:#16805a}.order-supplier-status.is-failed{color:#c54545}
+
+
+/* Order status timeline and courier tracking */
+.order-progress{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px;margin:8px 0 10px}
+.order-progress-step{display:flex;flex-direction:column;align-items:center;gap:5px;color:#9aa4b4;text-align:center;min-width:0}
+.order-progress-step>span{display:grid;place-items:center;width:27px;height:27px;border:1px solid #dbe1e9;border-radius:50%;font-size:.75rem;font-weight:800;background:#f8fafc}
+.order-progress-step small{font-size:.65rem;line-height:1.25;overflow-wrap:anywhere}.order-progress-step time{font-size:.58rem;line-height:1.25;color:#8894a5;font-weight:500;overflow-wrap:anywhere}
+.order-progress-step.is-done{color:#17835e}.order-progress-step.is-done>span{background:#e8f8ef;border-color:#9de0be;color:#147850}.order-progress-step.is-current small{font-weight:800;color:#173b72}
+.customer-tracking-box,.order-tracking-saved{display:grid;gap:6px;padding:12px;border:1px solid #c8e5d7;background:#f1fbf6;border-radius:10px;margin:9px 0;color:#315b49;font-size:.84rem;overflow-wrap:anywhere}
+.customer-tracking-box code,.order-tracking-saved code{font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-weight:700;overflow-wrap:anywhere}
+.customer-tracking-box .btn{justify-self:start;text-decoration:none}
+.admin-shipping-controls{border:1px solid #d8e4f4;background:#f8fbff;border-radius:12px;padding:12px;margin:8px 0;display:grid;gap:10px}
+.admin-shipping-controls>strong{color:var(--navy,#173b72);font-size:.9rem}
+.admin-shipping-fields{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.admin-shipping-fields label{display:grid;gap:5px;color:#66758a;font-size:.76rem;font-weight:700;min-width:0}
+.admin-shipping-fields input{width:100%;min-width:0;box-sizing:border-box;padding:9px 10px;border:1px solid #dfe5ee;border-radius:8px;background:#fff;color:#243349;font-size:.85rem}
+.admin-shipping-fields .tracking-url-field{grid-column:1/-1}
+.review-admin-image{display:block;max-width:min(100%,240px);max-height:220px;object-fit:contain;margin:10px 0;border:1px solid #e5e9f0;border-radius:10px;background:#f8fafc}
+.review-image-preview{display:block;max-width:220px;max-height:180px;object-fit:contain;margin-top:8px;border-radius:10px;border:1px solid #dfe5ee;background:#fff}
+@media(max-width:600px){.admin-shipping-fields{grid-template-columns:1fr}.admin-shipping-fields .tracking-url-field{grid-column:auto}.order-progress{gap:3px}.order-progress-step small{font-size:.59rem}.order-progress-step>span{width:24px;height:24px}}
