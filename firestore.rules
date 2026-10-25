@@ -11,42 +11,77 @@ service cloud.firestore {
         && get(/databases/$(database)/documents/admins/$(request.auth.uid)).data.role == 'admin';
     }
 
-    function validOrderCoupon(d) {
-      // Orders without coupon data may be placed by guests. If any coupon field is
-      // present, require a signed-in owner, the complete coupon payload, and a valid coupon.
+    // A coupon counter must be incremented in the same atomic transaction as
+    // the order that consumes it. The random Firestore order ID acts as the link.
+    function validCouponOrder(d, orderId) {
+      let couponPath = /databases/$(database)/documents/coupons/$(d.couponId);
+      let couponBefore = get(couponPath).data;
+      let couponAfter = getAfter(couponPath).data;
+      return exists(couponPath)
+        && d.keys().hasAll(['couponId', 'couponCode', 'couponDiscount', 'couponProductIds', 'productIds', 'totalQuantity', 'couponCounted'])
+        && signedIn() && d.customerUid == request.auth.uid
+        && d.couponCounted == true
+        && d.couponId is string && d.couponCode is string
+        && d.couponDiscount is number && d.couponDiscount >= 0 && d.couponDiscount <= d.subtotal
+        && d.couponProductIds is list && d.productIds is list
+        && couponBefore.active == true
+        && couponBefore.code == d.couponCode
+        && couponAfter.lastUsageOrderId == orderId
+        && couponAfter.diff(couponBefore).affectedKeys().hasOnly(['usedCount', 'lastUsageOrderId', 'updatedAt', 'active'])
+        && ((couponBefore.keys().hasAny(['usedCount'])
+              && couponBefore.usedCount is number
+              && couponAfter.usedCount == couponBefore.usedCount + 1)
+          || (!couponBefore.keys().hasAny(['usedCount']) && couponAfter.usedCount == 1))
+        && ((!couponBefore.keys().hasAny(['usageLimit']) || couponBefore.usageLimit == null)
+          || (couponBefore.keys().hasAny(['usedCount']) && couponBefore.usedCount is number
+              && couponBefore.usageLimit is number && couponBefore.usedCount < couponBefore.usageLimit)
+          || (!couponBefore.keys().hasAny(['usedCount']) && couponBefore.usageLimit is number && couponBefore.usageLimit > 0))
+        && (((!couponBefore.keys().hasAny(['usageLimit']) || couponBefore.usageLimit == null) && couponAfter.active == couponBefore.active)
+          || (couponBefore.usageLimit is number && couponAfter.usedCount < couponBefore.usageLimit && couponAfter.active == true)
+          || (couponBefore.usageLimit is number && couponAfter.usedCount == couponBefore.usageLimit && couponAfter.active == false))
+        && ((!couponBefore.keys().hasAny(['productIds']) && d.couponProductIds.size() == 0)
+          || (couponBefore.keys().hasAny(['productIds'])
+            && d.couponProductIds == couponBefore.productIds
+            && (couponBefore.productIds.size() == 0 || d.productIds.hasAny(couponBefore.productIds))))
+        && (!couponBefore.keys().hasAny(['minimumOrder']) || d.subtotal >= couponBefore.minimumOrder)
+        && (!couponBefore.keys().hasAny(['minimumQuantity'])
+          || (d.totalQuantity is number && d.totalQuantity >= couponBefore.minimumQuantity))
+        && (!couponBefore.keys().hasAny(['expiresAt']) || couponBefore.expiresAt == null || couponBefore.expiresAt > request.time)
+        && ((couponBefore.discountType == 'percent'
+              && d.couponDiscount <= d.subtotal * couponBefore.discountValue / 100)
+          || (couponBefore.discountType == 'fixed' && d.couponDiscount <= couponBefore.discountValue));
+    }
+
+    function validOrderCoupon(d, orderId) {
       return !d.keys().hasAny(['couponId', 'couponCode', 'couponDiscount', 'couponProductIds'])
-        || (d.keys().hasAll(['couponId', 'couponCode', 'couponDiscount', 'couponProductIds', 'productIds', 'totalQuantity'])
-          && signedIn() && d.customerUid == request.auth.uid
-          && d.couponId is string && d.couponCode is string
-          && d.couponDiscount is number && d.couponDiscount >= 0 && d.couponDiscount <= d.subtotal
-          && d.couponProductIds is list
-          && d.productIds is list
-          && exists(/databases/$(database)/documents/coupons/$(d.couponId))
-          && get(/databases/$(database)/documents/coupons/$(d.couponId)).data.active == true
-          && get(/databases/$(database)/documents/coupons/$(d.couponId)).data.code == d.couponCode
-          // Coupon product IDs must match the saved coupon. A targeted coupon must
-          // match at least one product in the order. Exact eligible-line totals are
-          // additionally rechecked in Admin Review before accepting the order.
-          && ((!get(/databases/$(database)/documents/coupons/$(d.couponId)).data.keys().hasAny(['productIds'])
-                && d.couponProductIds.size() == 0)
-            || (get(/databases/$(database)/documents/coupons/$(d.couponId)).data.keys().hasAny(['productIds'])
-                && d.couponProductIds == get(/databases/$(database)/documents/coupons/$(d.couponId)).data.productIds
-                && (get(/databases/$(database)/documents/coupons/$(d.couponId)).data.productIds.size() == 0
-                    || d.productIds.hasAny(get(/databases/$(database)/documents/coupons/$(d.couponId)).data.productIds))))
-          && d.subtotal >= get(/databases/$(database)/documents/coupons/$(d.couponId)).data.minimumOrder
-          && (!get(/databases/$(database)/documents/coupons/$(d.couponId)).data.keys().hasAny(['minimumQuantity'])
-            || (d.totalQuantity is number
-              && d.totalQuantity >= get(/databases/$(database)/documents/coupons/$(d.couponId)).data.minimumQuantity))
-          && (!get(/databases/$(database)/documents/coupons/$(d.couponId)).data.keys().hasAny(['expiresAt'])
-            || get(/databases/$(database)/documents/coupons/$(d.couponId)).data.expiresAt == null
-            || get(/databases/$(database)/documents/coupons/$(d.couponId)).data.expiresAt > request.time)
-          && (!get(/databases/$(database)/documents/coupons/$(d.couponId)).data.keys().hasAny(['usageLimit'])
-            || get(/databases/$(database)/documents/coupons/$(d.couponId)).data.usageLimit == null
-            || get(/databases/$(database)/documents/coupons/$(d.couponId)).data.usedCount < get(/databases/$(database)/documents/coupons/$(d.couponId)).data.usageLimit)
-          && ((get(/databases/$(database)/documents/coupons/$(d.couponId)).data.discountType == 'percent'
-                && d.couponDiscount <= d.subtotal * get(/databases/$(database)/documents/coupons/$(d.couponId)).data.discountValue / 100)
-            || (get(/databases/$(database)/documents/coupons/$(d.couponId)).data.discountType == 'fixed'
-                && d.couponDiscount <= get(/databases/$(database)/documents/coupons/$(d.couponId)).data.discountValue)));
+        || validCouponOrder(d, orderId);
+    }
+
+    function validCouponCounterUpdate(couponId) {
+      let before = resource.data;
+      let after = request.resource.data;
+      let orderPath = /databases/$(database)/documents/orders/$(after.lastUsageOrderId);
+      let orderAfter = getAfter(orderPath).data;
+      return signedIn()
+        && after.keys().hasAll(['usedCount', 'lastUsageOrderId'])
+        && after.diff(before).affectedKeys().hasOnly(['usedCount', 'lastUsageOrderId', 'updatedAt', 'active'])
+        && before.active == true
+        && before.code is string
+        && after.lastUsageOrderId is string && after.lastUsageOrderId.size() > 0
+        && !exists(orderPath) && existsAfter(orderPath)
+        && orderAfter.customerUid == request.auth.uid
+        && orderAfter.couponId == couponId
+        && orderAfter.couponCode == before.code
+        && orderAfter.couponCounted == true
+        && ((before.keys().hasAny(['usedCount']) && before.usedCount is number && after.usedCount == before.usedCount + 1)
+          || (!before.keys().hasAny(['usedCount']) && after.usedCount == 1))
+        && ((!before.keys().hasAny(['usageLimit']) || before.usageLimit == null)
+          || (before.keys().hasAny(['usedCount']) && before.usedCount is number
+              && before.usageLimit is number && before.usedCount < before.usageLimit && after.usedCount <= before.usageLimit)
+          || (!before.keys().hasAny(['usedCount']) && before.usageLimit is number && before.usageLimit >= 1 && after.usedCount <= before.usageLimit))
+        && (((!before.keys().hasAny(['usageLimit']) || before.usageLimit == null) && after.active == before.active)
+          || (before.usageLimit is number && after.usedCount < before.usageLimit && after.active == before.active)
+          || (before.usageLimit is number && after.usedCount == before.usageLimit && after.active == false));
     }
 
     function validCustomerReview() {
@@ -69,7 +104,7 @@ service cloud.firestore {
         && get(orderPath).data.status in ['sent', 'partially_fulfilled', 'confirmed', 'confirmed_manual', 'shipped', 'delivered', 'completed'];
     }
 
-    function validNewOrder() {
+    function validNewOrder(orderId) {
       let d = request.resource.data;
       return d.keys().hasAll([
         'orderNumber', 'customerUid', 'customerEmail', 'customerName', 'customerPhone',
@@ -108,8 +143,33 @@ service cloud.firestore {
       && d.total is number
       && ((d.keys().hasAny(['couponId']) && d.total == d.subtotal - d.couponDiscount + d.deliveryCharge)
           || (!d.keys().hasAny(['couponId']) && d.total == d.subtotal + d.deliveryCharge))
-      && validOrderCoupon(d)
+      && validOrderCoupon(d, orderId)
       && ((signedIn() && d.customerUid == request.auth.uid) || (!signedIn() && d.customerUid == null));
+    }
+
+    function validDeliveryAddress(a) {
+      return a is map
+        && a.keys().hasOnly(['id', 'label', 'customerName', 'customerPhone', 'email', 'division', 'district', 'area', 'address'])
+        && a.keys().hasAll(['id', 'label', 'customerName', 'customerPhone', 'email', 'division', 'district', 'area', 'address'])
+        && a.id is string && a.id.size() <= 80
+        && a.label is string && a.label.size() <= 120
+        && a.customerName is string && a.customerName.size() >= 2 && a.customerName.size() <= 100
+        && a.customerPhone is string && a.customerPhone.size() >= 8 && a.customerPhone.size() <= 20
+        && a.email is string && a.email.size() <= 254
+        && a.division is string && a.division.size() > 0 && a.division.size() <= 80
+        && a.district is string && a.district.size() > 0 && a.district.size() <= 80
+        && a.area is string && a.area.size() > 0 && a.area.size() <= 120
+        && a.address is string && a.address.size() > 0 && a.address.size() <= 500;
+    }
+
+    function validDeliveryAddresses(d) {
+      return !d.keys().hasAny(['deliveryAddresses'])
+        || (d.deliveryAddresses is list && d.deliveryAddresses.size() <= 5
+          && (d.deliveryAddresses.size() == 0 || validDeliveryAddress(d.deliveryAddresses[0]))
+          && (d.deliveryAddresses.size() < 2 || validDeliveryAddress(d.deliveryAddresses[1]))
+          && (d.deliveryAddresses.size() < 3 || validDeliveryAddress(d.deliveryAddresses[2]))
+          && (d.deliveryAddresses.size() < 4 || validDeliveryAddress(d.deliveryAddresses[3]))
+          && (d.deliveryAddresses.size() < 5 || validDeliveryAddress(d.deliveryAddresses[4])));
     }
 
     function validUserProfile(userId) {
@@ -118,13 +178,14 @@ service cloud.firestore {
         'uid', 'email', 'displayName', 'photoURL', 'providerIds', 'emailVerified',
         'createdAt', 'updatedAt', 'lastLoginAt', 'phone', 'customerPhone',
         'address', 'customerAddress', 'division', 'district', 'area',
-        'customerDivision', 'customerDistrict', 'customerArea', 'postalCode'
+        'customerDivision', 'customerDistrict', 'customerArea', 'postalCode', 'deliveryAddresses'
       ])
       && d.keys().hasAll(['uid', 'email', 'providerIds', 'emailVerified', 'updatedAt', 'lastLoginAt'])
       && d.uid == userId
       && d.email is string && d.email.size() <= 254
       && d.providerIds is list
-      && d.emailVerified is bool;
+      && d.emailVerified is bool
+      && validDeliveryAddresses(d);
     }
 
     // Public catalogue. Only published active products are readable without admin access.
@@ -156,7 +217,7 @@ service cloud.firestore {
     // Customers can create only an unmerged, pending-review order. Admin can create merged orders.
     // Only the admin may update/delete an order; customers can read their own orders when signed in.
     match /orders/{orderId} {
-      allow create: if isAdmin() || validNewOrder();
+      allow create: if isAdmin() || validNewOrder(orderId);
       allow read: if isAdmin() || (signedIn() && resource.data.customerUid == request.auth.uid);
       allow update, delete: if isAdmin();
     }
@@ -173,19 +234,24 @@ service cloud.firestore {
           'email', 'displayName', 'photoURL', 'providerIds', 'emailVerified',
           'updatedAt', 'lastLoginAt', 'phone', 'customerPhone', 'address',
           'customerAddress', 'division', 'district', 'area', 'customerDivision',
-          'customerDistrict', 'customerArea', 'postalCode'
+          'customerDistrict', 'customerArea', 'postalCode', 'deliveryAddresses'
         ])
       );
       allow delete: if isAdmin();
     }
 
-    // Coupons: shoppers may read only active, unexpired coupons; only Admin can create/update/use counters.
+    // Coupons: shoppers may read active coupons. A shopper may only increment usedCount atomically with a new, matching coupon order; all other coupon edits remain Admin-only.
     match /coupons/{couponId} {
       // Shoppers can look up a known coupon code, but cannot list every promotion.
-      allow get: if isAdmin() || (resource.data.active == true
-        && (!resource.data.keys().hasAny(['expiresAt']) || resource.data.expiresAt == null || resource.data.expiresAt > request.time));
+      allow get: if isAdmin() || (
+        (!resource.data.keys().hasAny(['expiresAt']) || resource.data.expiresAt == null || resource.data.expiresAt > request.time)
+        && (resource.data.active == true
+          || (resource.data.keys().hasAny(['usageLimit']) && resource.data.usageLimit is number
+            && resource.data.keys().hasAny(['usedCount']) && resource.data.usedCount is number
+            && resource.data.usedCount >= resource.data.usageLimit)));
       allow list: if isAdmin();
-      allow create, update, delete: if isAdmin();
+      allow create, delete: if isAdmin();
+      allow update: if isAdmin() || validCouponCounterUpdate(couponId);
     }
 
     // Reviews: only approved reviews are public. Customers can submit pending reviews linked to their own confirmed order.
