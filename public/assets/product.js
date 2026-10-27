@@ -19,7 +19,7 @@ function candidateImageUrls(value){
 function safeImageUrl(value){try{const url=new URL(String(value||'').trim(),location.origin);return ['https:','http:'].includes(url.protocol)?url.href:'';}catch{return '';}}
 function productImageList(p){
  const candidates=[p.images,p.adminOverrides?.images,p.sourceImages,p.imageUrls,p.imageUrl,p.image_url,p.image,p.thumbnailUrl,p.thumbnail];
- for(const candidate of candidates){const found=[...new Set(candidateImageUrls(candidate).map(safeImageUrl).filter(Boolean))];if(found.length)return found.slice(0,20);}
+ for(const candidate of candidates){const found=[...new Set(candidateImageUrls(candidate).map(safeImageUrl).filter(Boolean))];if(found.length)return found.slice(0,100);}
  return [];
 }
 function renderImageGallery(images,name){
